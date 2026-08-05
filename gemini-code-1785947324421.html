@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE WEDDING ISSUE • BLAHAUS EDITORIAL STYLE</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- LZ-String Compression Library (Rút gọn nén dữ liệu URL) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#F8F5F0',       /* Nền kem chuẩn Blahaus */
+                        charcoal: '#121212',    /* Chữ xám đen siêu trầm */
+                        burgundy: '#6B2329',    /* Đỏ rượu vang - Điểm nhấn Blahaus */
+                        beige: '#EFEBE4',       /* Khối màu kem đậm */
+                        sage: '#4A5D4E'         /* Xanh lá xô thơm */
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        mono: ['"Space Mono"', 'monospace'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8F5F0;
+            color: #121212;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .marquee-inner {
+            display: flex;
+            width: 200%;
+            animation: marquee 22s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .grain-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body x-data="{
+    // UI MODAL & CONTROL STATES
+    rsvpOpen: false,
+    giftOpen: false,
+    adminOpen: false,
+    adminAuthenticated: false,
+    showAdminBtn: true,
+    authEmail: '',
+    audioPlaying: false,
+    selectedColor: '',
+    isShortening: false,
+
+    // DỮ LIỆU THIỆP CÓ THỂ CHỈNH SỬA
+    cardData: {
+        groom: 'JULIAN',
+        bride: 'CLARA',
+        initials: 'C & J',
+        issueInfo: 'ISSUE NO. 2026 • HANOI, VIETNAM',
+        dateDisplay: '24.10.2026',
+        timeDisplay: '16:30 PM',
+        quote: 'Two lives, two hearts, joined together in friendship, united forever in love.',
+        heroImg: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=1200',
+        galleryImg1: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=600',
+        galleryImg2: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=600',
+        galleryImg3: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=600',
+        venueName: 'JW Marriott Hotel',
+        venueAddress: 'No. 08 Do Duc Duc, Nam Tu Liem, Hanoi, Vietnam',
+        mapUrl: 'https://maps.google.com',
+        targetDate: '2026-10-24T16:30',
+        musicUrl: 'https://files.catbox.moe/xxxxxx.mp3',
+        ownerEmail: 'chuthiep@gmail.com',
+        allowedEmails: 'codau@gmail.com, banthan@gmail.com',
+        bankInfo: 'MB Bank - NGUYEN VAN A',
+        bankNum: '123456789',
+        qrUrl: '',
+        
+        // QUẢN LÝ DRESSCODE MÀU SẮC
+        dresscodeColors: [
+            { label: 'Burgundy', name: 'Burgundy Wine (#6B2329)', hex: '#6B2329', textDark: false },
+            { label: 'Cream', name: 'Vintage Cream (#F8F5F0)', hex: '#F8F5F0', textDark: true },
+            { label: 'Charcoal', name: 'Deep Charcoal (#121212)', hex: '#121212', textDark: false },
+            { label: 'Sage', name: 'Sage Green (#4A5D4E)', hex: '#4A5D4E', textDark: false }
+        ],
+
+        // QUẢN LÝ LỊCH TRÌNH TIỆC CƯỚI (TIMELINE)
+        timeline: [
+            { tag: '01 / CEREMONY', title: 'Lễ Thành Hôn', time: '16:30 PM', desc: 'Trao nhẫn cưới & Lời thề nguyện trước sự chứng kiến của người thân và bạn bè.' },
+            { tag: '02 / COCKTAIL HOUR', title: 'Tiệc Trà & Giao Lưu', time: '17:30 PM', desc: 'Thưởng thức Cocktail nhẹ, âm nhạc Acoustic và chụp ảnh kỉ niệm cùng dâu rể.' },
+            { tag: '03 / DINNER & AFTERPARTY', title: 'Tiệc Tối & Khiêu Vũ', time: '18:30 PM', desc: 'Khai tiệc mừng, âm nhạc nghệ thuật và không gian khiêu vũ bùng nổ.' }
+        ]
+    },
+
+    // ĐẾM NGƯỢC
+    cdDays: '00', cdHours: '00', cdMinutes: '00', cdSeconds: '00',
+
+    // FORM RSVP & DANH SÁCH KHÁCH
+    rsvpForm: { name: '', phone: '', status: 'Chắc chắn tham dự', count: 1, message: '' },
+    rsvpList: [],
+
+    // KHỞI TẠO DỮ LIỆU & KIỂM TRA CHẾ ĐỘ XEM
+    init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isGuestMode = urlParams.get('mode') === 'guest';
+        const isAdminParam = urlParams.get('admin') === 'true';
+
+        // 1. Giải mã dữ liệu thiệp từ URL (Hỗ trợ cả thuật toán Nén LZString mới & Base64 cũ)
+        if (window.location.hash.startsWith('#data=')) {
+            try {
+                const encodedData = window.location.hash.replace('#data=', '');
+                let jsonStr = '';
+
+                // Thử giải nén LZString trước
+                if (window.LZString) {
+                    jsonStr = LZString.decompressFromEncodedURIComponent(encodedData);
+                }
+                
+                // Nêu không giải nén được bằng LZString thì fallback về Base64 cũ
+                if (!jsonStr) {
+                    jsonStr = decodeURIComponent(atob(encodedData));
+                }
+
+                if (jsonStr) {
+                    this.cardData = { ...this.cardData, ...JSON.parse(jsonStr) };
+                }
+            } catch (e) {
+                console.error('Không thể giải mã dữ liệu thiệp từ đường dẫn:', e);
+            }
+        } else {
+            // Lấy dữ liệu lưu trữ local nếu có
+            const savedCard = localStorage.getItem('blahaus_card_data');
+            if (savedCard) this.cardData = { ...this.cardData, ...JSON.parse(savedCard) };
+        }
+
+        // 2. Ẩn nút Cấu hình (Bánh răng) nếu truy cập qua Link Khách Mời (mode=guest) và không có tham số ?admin=true
+        if (isGuestMode && !isAdminParam) {
+            this.showAdminBtn = false;
+        } else {
+            this.showAdminBtn = true;
+        }
+
+        const savedRsvp = localStorage.getItem('blahaus_rsvp_list');
+        if (savedRsvp) this.rsvpList = JSON.parse(savedRsvp);
+
+        if (this.cardData.dresscodeColors && this.cardData.dresscodeColors.length > 0) {
+            this.selectedColor = this.cardData.dresscodeColors[0].name;
+        }
+
+        this.startCountdown();
+        this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+    },
+
+    // XỬ LÝ UPLOAD ẢNH TỪ ĐIỆN THOẠI / MÁY TÍNH
+    handleImageUpload(event, key) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 8 * 1024 * 1024) {
+            alert('Dung lượng ảnh vượt quá 8MB. Vui lòng chọn ảnh nhỏ hơn!');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            this.cardData[key] = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    },
+
+    // QUẢN LÝ TIMELINE LỊCH TRÌNH
+    addTimelineItem() {
+        this.cardData.timeline.push({
+            tag: `0${this.cardData.timeline.length + 1} / EVENT`,
+            title: 'Sự kiện mới',
+            time: '19:00 PM',
+            desc: 'Mô tả chi tiết hoạt động trong chương trình.'
+        });
+    },
+
+    removeTimelineItem(index) {
+        this.cardData.timeline.splice(index, 1);
+    },
+
+    // QUẢN LÝ DRESSCODE
+    addDresscodeColor() {
+        this.cardData.dresscodeColors.push({
+            label: 'Màu mới',
+            name: 'Màu tùy chọn (#888888)',
+            hex: '#888888',
+            textDark: false
+        });
+    },
+
+    removeDresscodeColor(index) {
+        this.cardData.dresscodeColors.splice(index, 1);
+    },
+
+    // XUẤT LINK KHÁCH MỜI AN TOÀN + TỰ ĐỘNG NÉN & RÚT GỌN LINK
+    async generateGuestLink() {
+        this.isShortening = true;
+        try {
+            // Lưu dữ liệu vào máy hiện tại
+            localStorage.setItem('blahaus_card_data', JSON.stringify(this.cardData));
+            
+            // 1. Nén chuỗi JSON dữ liệu bằng thuật toán LZString (Giảm dung lượng URL ~70%)
+            const jsonStr = JSON.stringify(this.cardData);
+            let encodedData = '';
+            if (window.LZString) {
+                encodedData = LZString.compressToEncodedURIComponent(jsonStr);
+            } else {
+                encodedData = btoa(encodeURIComponent(jsonStr));
+            }
+
+            const originUrl = window.location.origin + window.location.pathname;
+            const rawGuestUrl = `${originUrl}?mode=guest#data=${encodedData}`;
+
+            let finalLink = rawGuestUrl;
+            let isTinyUrlSuccess = false;
+
+            // 2. Nếu không phải file:// (trên Web hosting thực tế như Github Pages / Vercel / Netlify), tự động gọi API TinyURL để tạo link cực ngắn
+            if (!rawGuestUrl.startsWith('file:')) {
+                try {
+                    const apiRes = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(rawGuestUrl)}`);
+                    if (apiRes.ok) {
+                        const shortUrl = await apiRes.text();
+                        if (shortUrl && shortUrl.startsWith('http')) {
+                            finalLink = shortUrl;
+                            isTinyUrlSuccess = true;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('TinyURL API không phản hồi, dùng link nén LZString:', err);
+                }
+            }
+
+            // Copy vào Clipboard
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(finalLink);
+            } else {
+                prompt('Sao chép đường dẫn gửi khách bên dưới:', finalLink);
+            }
+
+            // Thông báo tới người dùng
+            if (isTinyUrlSuccess) {
+                alert('★ TỰ ĐỘNG RÚT GỌN LINK THÀNH CÔNG!\n\nLink ngắn siêu đẹp: ' + finalLink + '\n\n✓ Đã tự động ẩn nút bánh răng chỉnh sửa.\n✓ Đã sao chép vào bộ nhớ tạm!');
+            } else if (rawGuestUrl.startsWith('file:')) {
+                alert('★ ĐÃ NÉN LINK SIÊU NGẮN VÀ SAO CHÉP!\n\nLưu ý: Do bạn đang mở file trực tiếp trên máy tính (file:///), các dịch vụ rút gọn link như TinyURL yêu cầu địa chỉ trang web online.\n\nThuật toán đã tự động NÉN chuỗi dữ liệu ngắn hơn 70%. Sau này khi up file lên Web/Github Pages, hệ thống sẽ tự động rút gọn thành dạng tinyurl.com/xxx siêu ngắn!');
+            } else {
+                alert('★ ĐÃ NÉN VÀ SAO CHÉP LINK GỬI KHÁCH!\n\nLink đã được nén tối đa và ẩn hoàn toàn nút bánh răng chỉnh sửa.');
+            }
+
+        } catch (e) {
+            alert('Có lỗi khi tạo đường dẫn: ' + e.message);
+        } finally {
+            this.isShortening = false;
+        }
+    },
+
+    // QUẢN LÝ PHÁT NHẠC
+    toggleAudio() {
+        const audio = this.$refs.audioPlayer;
+        if (this.audioPlaying) {
+            audio.pause();
+            this.audioPlaying = false;
+        } else {
+            audio.play().then(() => {
+                this.audioPlaying = true;
+            }).catch(() => {});
+        }
+    },
+
+    // BỘ ĐẾM NGƯỢC
+    startCountdown() {
+        const update = () => {
+            const target = new Date(this.cardData.targetDate).getTime();
+            const now = new Date().getTime();
+            const diff = target - now;
+
+            if (diff > 0) {
+                this.cdDays = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                this.cdHours = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                this.cdMinutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                this.cdSeconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+            } else {
+                this.cdDays = '00'; this.cdHours = '00'; this.cdMinutes = '00'; this.cdSeconds = '00';
+            }
+        };
+        update();
+        setInterval(update, 1000);
+    },
+
+    // XÁC THỰC ADMIN
+    verifyEmail() {
+        const email = this.authEmail.trim().toLowerCase();
+        const owner = this.cardData.ownerEmail.trim().toLowerCase();
+        const allowed = this.cardData.allowedEmails.split(',').map(e => e.trim().toLowerCase());
+
+        if (email === owner || allowed.includes(email)) {
+            this.adminAuthenticated = true;
+        } else {
+            alert('Email của bạn không có quyền truy cập quản trị!');
+        }
+    },
+
+    // LƯU CẤU HÌNH THIỆP
+    saveCardData() {
+        localStorage.setItem('blahaus_card_data', JSON.stringify(this.cardData));
+        this.adminOpen = false;
+        alert('Đã lưu toàn bộ thay đổi vào thiết bị hiện tại!');
+    },
+
+    // GỬI RSVP
+    submitRSVP() {
+        const entry = { ...this.rsvpForm, date: new Date().toLocaleString('vi-VN') };
+        this.rsvpList.push(entry);
+        localStorage.setItem('blahaus_rsvp_list', JSON.stringify(this.rsvpList));
+        this.rsvpOpen = false;
+        this.rsvpForm = { name: '', phone: '', status: 'Chắc chắn tham dự', count: 1, message: '' };
+        alert('Cảm ơn bạn đã gửi xác nhận tham dự!');
+    }
+}" class="grain-overlay relative min-h-screen">
+
+    <!-- AUDIO PLAYER GIẤU KÍN -->
+    <audio x-ref="audioPlayer" :src="cardData.musicUrl" loop preload="auto"></audio>
+
+    <!-- 1. NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-[#F8F5F0]/90 backdrop-blur-md border-b border-black/15 px-6 py-4 flex justify-between items-center">
+        <div class="font-mono text-xs tracking-widest uppercase text-charcoal">
+            VOL. 01 • BLAHAUS WEDDING ISSUE
+        </div>
+        <div class="font-serif italic text-2xl font-bold tracking-tight text-burgundy" x-text="cardData.initials">
+            C & J
+        </div>
+        <!-- AMBIENT AUDIO BUTTON -->
+        <button @click="toggleAudio()" class="flex items-center gap-2 border border-black/30 rounded-full px-3 py-1.5 text-xs font-mono hover:bg-burgundy hover:text-white hover:border-burgundy transition-all">
+            <i data-lucide="disc" class="w-3.5 h-3.5 animate-spin" x-show="audioPlaying"></i>
+            <i data-lucide="music" class="w-3.5 h-3.5" x-show="!audioPlaying"></i>
+            <span x-text="audioPlaying ? 'PAUSE AMBIENT' : 'PLAY SOUND'"></span>
+        </button>
+    </header>
+
+    <!-- 2. HERO SECTION (MAGAZINE COVER STYLE) -->
+    <section class="border-b border-black/15 px-6 py-10 md:py-16 max-w-7xl mx-auto">
+        <!-- HEADER TOP LINE -->
+        <div class="flex justify-between items-end border-b border-black/20 pb-3 mb-8">
+            <span class="font-mono text-xs text-charcoal/70 uppercase tracking-wider" x-text="cardData.issueInfo">
+                ISSUE NO. 2026 • HANOI, VIETNAM
+            </span>
+            <span class="font-mono text-xs text-burgundy font-bold uppercase tracking-wider" x-text="cardData.dateDisplay">
+                24.10.2026
+            </span>
+        </div>
+
+        <!-- MAIN TITLE (COUPLE NAMES) -->
+        <div class="text-center my-8 md:my-12">
+            <p class="font-mono text-xs md:text-sm tracking-[0.3em] uppercase text-charcoal/60 mb-4">TOGETHER WITH THEIR FAMILIES</p>
+            
+            <h1 class="font-serif text-5xl md:text-9xl font-normal tracking-tight uppercase leading-none mb-4 text-charcoal">
+                <span x-text="cardData.bride">CLARA</span> <span class="font-serif italic font-light lowercase text-4xl md:text-8xl text-burgundy">&amp;</span> <span x-text="cardData.groom">JULIAN</span>
+            </h1>
+            
+            <p class="font-serif italic text-lg md:text-2xl text-charcoal/80 max-w-2xl mx-auto" x-text="`&ldquo;${cardData.quote}&rdquo;`">
+                "Two lives, two hearts, joined together in friendship, united forever in love."
+            </p>
+        </div>
+
+        <!-- HERO IMAGE GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch mt-10">
+            <!-- MAIN PHOTO -->
+            <div class="md:col-span-8 relative border border-black/20 p-2.5 bg-white shadow-sm">
+                <img :src="cardData.heroImg" alt="Couple Portrait" class="w-full h-[450px] md:h-[580px] object-cover grayscale hover:grayscale-0 transition-all duration-700">
+                <div class="absolute bottom-6 left-6 bg-cream/95 backdrop-blur px-4 py-2 border border-black/20 font-mono text-xs text-charcoal">
+                    FIG 1.0 — THE WEDDING COVER STORY
+                </div>
+            </div>
+
+            <!-- SIDE INFO BLOCK & STAMP -->
+            <div class="md:col-span-4 flex flex-col justify-between space-y-6">
+                <!-- VENUE CARD -->
+                <div class="border border-black/20 p-6 bg-beige/60 flex-1 flex flex-col justify-between">
+                    <div>
+                        <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-2">[ VENUE & LOCATION ]</span>
+                        <h3 class="font-serif text-3xl font-semibold mb-2" x-text="cardData.venueName">JW Marriott Hotel</h3>
+                        <p class="text-xs md:text-sm text-charcoal/70 font-sans mb-6 leading-relaxed" x-text="cardData.venueAddress">
+                            No. 08 Do Duc Duc, Nam Tu Liem, Hanoi, Vietnam
+                        </p>
+                    </div>
+                    <div>
+                        <a :href="cardData.mapUrl" target="_blank" class="mb-4 inline-flex items-center gap-2 font-mono text-xs text-burgundy underline font-bold uppercase hover:text-black">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> Mở Google Maps chỉ đường
+                        </a>
+                        <div class="border-t border-black/20 pt-4 flex justify-between items-center font-mono text-xs">
+                            <span>CEREMONY STARTS:</span>
+                            <span class="font-bold text-burgundy bg-white px-2 py-1 border border-black/10" x-text="cardData.timeDisplay">16:30 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BLAHAUS VINTAGE STAMP -->
+                <div class="border border-black/20 p-8 flex flex-col items-center justify-center text-center bg-white relative overflow-hidden group">
+                    <div class="w-28 h-28 rounded-full border-2 border-dashed border-burgundy flex items-center justify-center animate-[spin_15s_linear_infinite] group-hover:border-black transition-colors">
+                        <span class="font-mono text-[9.5px] tracking-widest uppercase text-burgundy font-bold">OFFICIAL INVITATION • SAVE THE DATE •</span>
+                    </div>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span class="font-serif italic text-3xl font-bold text-charcoal" x-text="cardData.dateDisplay.split('.')[0] + '.' + cardData.dateDisplay.split('.')[1]">24.10</span>
+                        <span class="font-mono text-[9px] uppercase tracking-widest text-burgundy" x-text="cardData.dateDisplay.split('.')[2] || '2026'">2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COUNTDOWN TIMER -->
+        <div class="mt-12 border border-black/20 bg-white p-6 md:p-8">
+            <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-4 text-center tracking-widest">// COUNTDOWN TO THE BIG DAY</span>
+            <div class="grid grid-cols-4 gap-4 text-center font-mono">
+                <div class="border-r border-black/10 pr-2">
+                    <span class="text-3xl md:text-6xl font-serif text-charcoal block" x-text="cdDays">00</span>
+                    <span class="text-[10px] md:text-xs text-charcoal/50 uppercase tracking-widest">NGÀY</span>
+                </div>
+                <div class="border-r border-black/10 pr-2">
+                    <span class="text-3xl md:text-6xl font-serif text-charcoal block" x-text="cdHours">00</span>
+                    <span class="text-[10px] md:text-xs text-charcoal/50 uppercase tracking-widest">GIỜ</span>
+                </div>
+                <div class="border-r border-black/10 pr-2">
+                    <span class="text-3xl md:text-6xl font-serif text-charcoal block" x-text="cdMinutes">00</span>
+                    <span class="text-[10px] md:text-xs text-charcoal/50 uppercase tracking-widest">PHÚT</span>
+                </div>
+                <div>
+                    <span class="text-3xl md:text-6xl font-serif text-burgundy block" x-text="cdSeconds">00</span>
+                    <span class="text-[10px] md:text-xs text-charcoal/50 uppercase tracking-widest">GIÂY</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. BLAHAUS MARQUEE TICKER -->
+    <div class="border-y border-black py-3 bg-burgundy text-cream overflow-hidden whitespace-nowrap font-mono text-xs tracking-widest uppercase">
+        <div class="marquee-inner">
+            <span class="mx-6">★ JOIN US FOR OUR WEDDING CELEBRATION</span>
+            <span class="mx-6" x-text="`★ ${cardData.dateDisplay}`">★ OCTOBER 24, 2026</span>
+            <span class="mx-6">★ HANOI, VIETNAM</span>
+            <span class="mx-6">★ DRESS CODE: EARTH TONES & BURGUNDY</span>
+            <span class="mx-6">★ JOIN US FOR OUR WEDDING CELEBRATION</span>
+            <span class="mx-6" x-text="`★ ${cardData.dateDisplay}`">★ OCTOBER 24, 2026</span>
+            <span class="mx-6">★ HANOI, VIETNAM</span>
+            <span class="mx-6">★ DRESS CODE: EARTH TONES & BURGUNDY</span>
+        </div>
+    </div>
+
+    <!-- 4. EDITORIAL PHOTO GALLERY -->
+    <section class="max-w-7xl mx-auto px-6 py-20 border-b border-black/15">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
+            <div>
+                <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-2">// ALBUM NGHỆ THUẬT</span>
+                <h2 class="font-serif text-4xl md:text-6xl uppercase tracking-tight">Moments in Frame</h2>
+            </div>
+            <p class="font-sans text-xs md:text-sm text-charcoal/70 max-w-md mt-4 md:mt-0 leading-relaxed">
+                Những khoảnh khắc chân thật và bình yên nhất được ghi lại trong suốt chặng đường đồng hành cùng nhau.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-3">
+                <div class="border border-black/20 p-2 bg-white">
+                    <img :src="cardData.galleryImg1" class="w-full h-80 object-cover grayscale hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="font-mono text-xs flex justify-between text-charcoal/60 border-t border-black/10 pt-2">
+                    <span>FIG 1.1 — MEMORIES</span>
+                    <span>SWEET JOURNEY</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 md:mt-10">
+                <div class="border border-black/20 p-2 bg-white">
+                    <img :src="cardData.galleryImg2" class="w-full h-80 object-cover grayscale hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="font-mono text-xs flex justify-between text-charcoal/60 border-t border-black/10 pt-2">
+                    <span>FIG 1.2 — THE PROPOSAL</span>
+                    <span>UNFORGETTABLE</span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="border border-black/20 p-2 bg-white">
+                    <img :src="cardData.galleryImg3" class="w-full h-80 object-cover grayscale hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="font-mono text-xs flex justify-between text-charcoal/60 border-t border-black/10 pt-2">
+                    <span>FIG 1.3 — DAILY LIFE</span>
+                    <span>FOREVER TO GO</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. WEDDING TIMELINE -->
+    <section class="max-w-7xl mx-auto px-6 py-20 border-b border-black/15">
+        <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-2">// SCHEDULE OF EVENTS</span>
+        <h2 class="font-serif text-4xl md:text-6xl uppercase tracking-tight mb-12">Lịch Trình Tiệc Cưới</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 border-t border-l border-black/20">
+            <template x-for="(item, index) in cardData.timeline" :key="index">
+                <div class="border-b border-r border-black/20 p-8 bg-white flex flex-col justify-between h-72">
+                    <div>
+                        <span class="font-mono text-xs text-burgundy font-bold" x-text="item.tag">01 / CEREMONY</span>
+                        <h3 class="font-serif text-3xl mt-2 mb-2" x-text="item.title">Lễ Thành Hôn</h3>
+                        <p class="font-sans text-xs text-charcoal/70 leading-relaxed" x-text="item.desc">Trao nhẫn cưới &amp; Lời thề nguyện...</p>
+                    </div>
+                    <div class="font-mono text-xl font-bold border-t border-black/10 pt-4 text-charcoal" x-text="item.time">
+                        16:30 PM
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+
+    <!-- 6. DRESS CODE RECOMMENDATION -->
+    <section class="max-w-7xl mx-auto px-6 py-20 border-b border-black/15">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div class="md:col-span-5">
+                <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-2">// DRESS CODE RECOMMENDATION</span>
+                <h2 class="font-serif text-4xl uppercase mb-4">Trang Phục Gợi Ý</h2>
+                <p class="font-sans text-xs md:text-sm text-charcoal/70 mb-6 leading-relaxed">
+                    Để tạo nên bức hình lưu niệm hài hòa mang tinh thần Tạp chí Thời trang, rất mong Quý khách chọn trang phục theo tông màu gợi ý:
+                </p>
+                <div class="font-mono text-xs border-l-2 border-burgundy pl-3 py-1 text-charcoal">
+                    MÀU ĐÃ CHỌN: <span class="font-bold text-burgundy" x-text="selectedColor"></span>
+                </div>
+            </div>
+
+            <div class="md:col-span-7 flex flex-wrap gap-4 justify-start md:justify-end">
+                <template x-for="(col, index) in cardData.dresscodeColors" :key="index">
+                    <button @click="selectedColor = col.name" 
+                            class="w-20 h-20 rounded-full border border-black/20 flex flex-col items-center justify-center p-2 text-center hover:scale-105 transition-all"
+                            :style="`background-color: ${col.hex}`"
+                            :class="col.textDark ? 'text-charcoal' : 'text-white'">
+                        <span class="font-mono text-[9px]" x-text="col.label"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. BOARDING PASS / TICKET STYLE RSVP & ACTIONS -->
+    <section class="max-w-4xl mx-auto px-6 py-20">
+        <div class="text-center mb-10">
+            <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-2">// ADMISSION TICKET</span>
+            <h2 class="font-serif text-5xl uppercase tracking-tight">Tấm Vé Mời Cưới</h2>
+        </div>
+
+        <!-- VINTAGE TICKET -->
+        <div class="border-2 border-black bg-white p-6 md:p-10 relative shadow-[10px_10px_0px_0px_rgba(107,35,41,1)]">
+            <div class="flex justify-between items-center border-b-2 border-dashed border-black/30 pb-6 mb-6">
+                <div>
+                    <span class="font-mono text-[10px] text-charcoal/50 block">GUEST OF HONOR</span>
+                    <span class="font-serif text-2xl font-bold uppercase text-charcoal">QUÝ KHÁCH THÂN MỜI</span>
+                </div>
+                <div class="text-right">
+                    <span class="font-mono text-[10px] text-charcoal/50 block">ADMIT ONE</span>
+                    <span class="font-mono text-xs font-bold bg-burgundy text-white px-2 py-1">VIP ACCESS</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 font-mono text-xs">
+                <div>
+                    <span class="text-charcoal/50 block text-[10px]">DATE</span>
+                    <span class="font-bold" x-text="cardData.dateDisplay">24 OCT 2026</span>
+                </div>
+                <div>
+                    <span class="text-charcoal/50 block text-[10px]">TIME</span>
+                    <span class="font-bold" x-text="cardData.timeDisplay">16:30 PM</span>
+                </div>
+                <div>
+                    <span class="text-charcoal/50 block text-[10px]">VENUE</span>
+                    <span class="font-bold uppercase" x-text="cardData.venueName">JW MARRIOTT</span>
+                </div>
+                <div>
+                    <span class="text-charcoal/50 block text-[10px]">STATUS</span>
+                    <span class="font-bold text-burgundy">PENDING RSVP</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-t border-black/10 pt-6">
+                <!-- BARCODE MOCKUP -->
+                <div class="font-mono text-[10px] tracking-[0.4em] uppercase text-charcoal/40">
+                    ||||||||||||||||||||||||||||||||||||||||||| <br> BLAHAUS-WEDDING-2026
+                </div>
+
+                <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                    <!-- RSVP BUTTON -->
+                    <button @click="rsvpOpen = true" class="flex-1 md:flex-none bg-burgundy text-white hover:bg-black font-mono text-xs uppercase px-6 py-3.5 transition-all tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        XÁC NHẬN THAM DỰ
+                    </button>
+                    <!-- GIFT BOX BUTTON -->
+                    <button @click="giftOpen = true" class="flex-1 md:flex-none border border-black bg-beige hover:bg-black hover:text-white font-mono text-xs uppercase px-6 py-3.5 transition-all tracking-widest flex items-center justify-center gap-2">
+                        <i data-lucide="gift" class="w-4 h-4"></i>
+                        MỪNG CƯỚI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. RSVP MODAL POPUP -->
+    <div x-show="rsvpOpen" x-transition.opacity class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+        <div @click.outside="rsvpOpen = false" class="bg-white border-2 border-black p-8 max-w-lg w-full relative shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
+            <button @click="rsvpOpen = false" class="absolute top-4 right-4 text-black hover:opacity-50">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-1">XÁC NHẬN THAM DỰ</span>
+            <h3 class="font-serif text-3xl font-bold uppercase mb-6">RSVP FORM</h3>
+
+            <form @submit.prevent="submitRSVP()" class="space-y-4 font-sans text-sm">
+                <div>
+                    <label class="block font-mono text-xs uppercase mb-1">Họ và Tên *</label>
+                    <input type="text" x-model="rsvpForm.name" required placeholder="Nguyễn Văn A" class="w-full border border-black p-3 font-sans focus:outline-none focus:ring-2 focus:ring-burgundy">
+                </div>
+
+                <div>
+                    <label class="block font-mono text-xs uppercase mb-1">Số Điện Thoại</label>
+                    <input type="tel" x-model="rsvpForm.phone" placeholder="0901234567" class="w-full border border-black p-3 font-sans focus:outline-none focus:ring-2 focus:ring-burgundy">
+                </div>
+
+                <div>
+                    <label class="block font-mono text-xs uppercase mb-1">Xác nhận tham dự</label>
+                    <select x-model="rsvpForm.status" class="w-full border border-black p-3 font-sans focus:outline-none focus:ring-2 focus:ring-burgundy">
+                        <option value="Chắc chắn tham dự">Chắc chắn sẽ đến tham dự</option>
+                        <option value="Có thể đến">Có thể tham dự</option>
+                        <option value="Rất tiếc vắng mặt">Rất tiếc không thể đến</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-mono text-xs uppercase mb-1">Đi cùng bao nhiêu người?</label>
+                    <input type="number" x-model="rsvpForm.count" min="1" max="5" class="w-full border border-black p-3 font-sans focus:outline-none focus:ring-2 focus:ring-burgundy">
+                </div>
+
+                <div>
+                    <label class="block font-mono text-xs uppercase mb-1">Lời chúc dành cho Cô dâu & Chú rể</label>
+                    <textarea x-model="rsvpForm.message" rows="3" placeholder="Gửi lời chúc yêu thương tại đây..." class="w-full border border-black p-3 font-sans focus:outline-none focus:ring-2 focus:ring-burgundy"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-burgundy text-white font-mono text-xs uppercase py-4 hover:bg-black transition-all tracking-widest mt-4">
+                    GỬI XÁC NHẬN RSVP
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 9. GIFT BOX MODAL POPUP -->
+    <div x-show="giftOpen" x-transition.opacity class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+        <div @click.outside="giftOpen = false" class="bg-white border-2 border-black p-8 max-w-md w-full relative shadow-[10px_10px_0px_0px_rgba(107,35,41,1)] text-center">
+            <button @click="giftOpen = false" class="absolute top-4 right-4 text-black hover:opacity-50">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-1">// WEDDING GIFT BOX</span>
+            <h3 class="font-serif text-3xl font-bold uppercase mb-4">Hộp Mừng Cưới</h3>
+            <p class="font-sans text-xs text-charcoal/70 mb-6">Chân thành cảm ơn những tình cảm và lời chúc mừng tốt đẹp nhất từ quý khách!</p>
+
+            <div class="border border-black p-4 bg-beige/50 text-left font-mono text-xs mb-6 space-y-2">
+                <div>THÔNG TIN: <span class="font-bold text-burgundy block text-sm" x-text="cardData.bankInfo">MB Bank - NGUYEN VAN A</span></div>
+                <div>SỐ TÀI KHOẢN: <span class="font-bold text-black block text-lg tracking-wider" x-text="cardData.bankNum">123456789</span></div>
+            </div>
+
+            <div class="flex justify-center border border-black/20 p-4 bg-white">
+                <img :src="cardData.qrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${cardData.bankNum}`" alt="QR Code Mừng Cưới" class="w-48 h-48 object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. ADMIN MODAL (QUẢN TRỊ BẢNG ĐIỀU KHIỂN & LỊCH TRÌNH / XUẤT LINK RÚT GỌN) -->
+    <div x-show="adminOpen" x-transition.opacity class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+        <div @click.outside="adminOpen = false" class="bg-white border-2 border-black p-6 md:p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto relative shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
+            <button @click="adminOpen = false" class="absolute top-4 right-4 text-black hover:opacity-50">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <span class="font-mono text-xs uppercase text-burgundy font-bold block mb-1">// ADMIN PANEL</span>
+            <h3 class="font-serif text-3xl font-bold uppercase mb-6">Quản Trị Thiệp Cưới</h3>
+
+            <!-- XÁC THỰC EMAIL -->
+            <template x-if="!adminAuthenticated">
+                <div class="space-y-4 font-mono text-xs">
+                    <p class="text-charcoal/80">Nhập email chủ thiệp để mở giao diện chỉnh sửa:</p>
+                    <input type="email" x-model="authEmail" placeholder="vd: chuthiep@gmail.com" class="w-full border border-black p-3 font-sans">
+                    <button @click="verifyEmail()" class="w-full bg-burgundy text-white py-3 hover:bg-black uppercase tracking-widest font-mono">
+                        XÁC NHẬN TÁC GIẢ
+                    </button>
+                </div>
+            </template>
+
+            <!-- FORM BẢNG ĐIỀU KHIỂN -->
+            <template x-if="adminAuthenticated">
+                <div class="space-y-6 font-sans text-xs">
+                    
+                    <!-- MỤC TÍNH NĂNG TỰ ĐỘNG NÉN & RÚT GỌN LINK -->
+                    <div class="p-4 bg-burgundy/10 border-2 border-burgundy">
+                        <h4 class="font-mono font-bold text-burgundy uppercase text-sm mb-1 flex items-center gap-2">
+                            <i data-lucide="scissors" class="w-4 h-4"></i> Xuất Link Rút Gọn Gửi Khách Mời
+                        </h4>
+                        <p class="text-charcoal/70 mb-3 text-[11px] leading-relaxed">
+                            Hệ thống đã tích hợp thuật toán **Nén dữ liệu LZ-String** (giảm 70% độ dài link) + **Tự động gọi API TinyURL**. Link khách mời tạo ra sẽ ngắn gọn, chuyên nghiệp và **ẨN BÁNH RĂNG CƯA** hoàn toàn.
+                        </p>
+                        <button @click="generateGuestLink()" :disabled="isShortening" class="w-full bg-burgundy text-white font-mono uppercase py-3 hover:bg-black tracking-widest text-xs flex items-center justify-center gap-2 transition-all disabled:opacity-50">
+                            <i data-lucide="link" class="w-4 h-4" x-show="!isShortening"></i>
+                            <i data-lucide="loader" class="w-4 h-4 animate-spin" x-show="isShortening"></i>
+                            <span x-text="isShortening ? 'ĐANG RÚT GỌN LINK...' : 'TẠO & SAO CHÉP LINK RÚT GỌN'"></span>
+                        </button>
+                    </div>
+
+                    <!-- MỤC 1: QUẢN LÝ LỊCH TRÌNH TIỆC CƯỚI (TIMELINE) -->
+                    <div class="border-b border-black/20 pb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-mono font-bold text-burgundy uppercase text-sm flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4"></i> 1. Chỉnh Sửa Lịch Trình Tiệc Cưới
+                            </h4>
+                            <button @click="addTimelineItem()" class="bg-black text-white font-mono text-[10px] px-2.5 py-1 uppercase">
+                                + Thêm Mục
+                            </button>
+                        </div>
+
+                        <div class="space-y-3">
+                            <template x-for="(item, idx) in cardData.timeline" :key="idx">
+                                <div class="border border-black/10 p-3 bg-beige/30 space-y-2 relative">
+                                    <button @click="removeTimelineItem(idx)" class="absolute top-2 right-2 text-red-600 font-bold hover:text-black">✕</button>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="font-mono text-[10px] block">Thẻ (VD: 01 / CEREMONY):</label>
+                                            <input type="text" x-model="item.tag" class="w-full border border-black p-1.5 font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="font-mono text-[10px] block">Giờ tổ chức:</label>
+                                            <input type="text" x-model="item.time" class="w-full border border-black p-1.5 font-mono">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="font-mono text-[10px] block">Tên sự kiện / Hoạt động:</label>
+                                        <input type="text" x-model="item.title" class="w-full border border-black p-1.5 font-sans font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="font-mono text-[10px] block">Mô tả ngắn gọn:</label>
+                                        <textarea x-model="item.desc" rows="2" class="w-full border border-black p-1.5 font-sans"></textarea>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- MỤC 2: CẤU HÌNH HÌNH ẢNH -->
+                    <div class="border-b border-black/20 pb-4">
+                        <h4 class="font-mono font-bold text-burgundy uppercase mb-3 text-sm flex items-center gap-2">
+                            <i data-lucide="image" class="w-4 h-4"></i> 2. Quản lý Ảnh Cưới & Mã QR
+                        </h4>
+                        
+                        <!-- ẢNH BÌA HERO -->
+                        <div class="mb-4 border border-black/10 p-3 bg-beige/30">
+                            <label class="font-mono block font-bold mb-1">Ảnh Bìa Thiệp Cưới (Hero Cover):</label>
+                            <div class="flex items-center gap-3 mb-2">
+                                <img :src="cardData.heroImg" class="w-16 h-16 object-cover border border-black">
+                                <input type="file" accept="image/*" @change="handleImageUpload($event, 'heroImg')" class="font-mono text-xs">
+                            </div>
+                            <input type="text" x-model="cardData.heroImg" placeholder="Hoặc dán URL ảnh bìa..." class="w-full border border-black p-2 font-mono">
+                        </div>
+
+                        <!-- ẢNH ALBUM 1, 2, 3 -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                            <div class="border border-black/10 p-2 bg-beige/30">
+                                <label class="font-mono block font-bold mb-1">Ảnh Album 1:</label>
+                                <img :src="cardData.galleryImg1" class="w-full h-20 object-cover border border-black mb-1">
+                                <input type="file" accept="image/*" @change="handleImageUpload($event, 'galleryImg1')" class="font-mono text-[10px] w-full">
+                            </div>
+
+                            <div class="border border-black/10 p-2 bg-beige/30">
+                                <label class="font-mono block font-bold mb-1">Ảnh Album 2:</label>
+                                <img :src="cardData.galleryImg2" class="w-full h-20 object-cover border border-black mb-1">
+                                <input type="file" accept="image/*" @change="handleImageUpload($event, 'galleryImg2')" class="font-mono text-[10px] w-full">
+                            </div>
+
+                            <div class="border border-black/10 p-2 bg-beige/30">
+                                <label class="font-mono block font-bold mb-1">Ảnh Album 3:</label>
+                                <img :src="cardData.galleryImg3" class="w-full h-20 object-cover border border-black mb-1">
+                                <input type="file" accept="image/*" @change="handleImageUpload($event, 'galleryImg3')" class="font-mono text-[10px] w-full">
+                            </div>
+                        </div>
+
+                        <!-- ẢNH QR CODE -->
+                        <div class="border border-black/10 p-3 bg-beige/30">
+                            <label class="font-mono block font-bold mb-1">Ảnh QR Code Chuyển Khoản Mừng Cưới:</label>
+                            <div class="flex items-center gap-3 mb-2">
+                                <img :src="cardData.qrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${cardData.bankNum}`" class="w-16 h-16 object-contain border border-black bg-white">
+                                <input type="file" accept="image/*" @change="handleImageUpload($event, 'qrUrl')" class="font-mono text-xs">
+                            </div>
+                            <input type="text" x-model="cardData.qrUrl" placeholder="Hoặc dán URL mã QR..." class="w-full border border-black p-2 font-mono">
+                        </div>
+                    </div>
+
+                    <!-- MỤC 3: QUẢN LÝ DRESSCODE -->
+                    <div class="border-b border-black/20 pb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-mono font-bold text-burgundy uppercase text-sm flex items-center gap-2">
+                                <i data-lucide="palette" class="w-4 h-4"></i> 3. Tùy Chọn Màu Dresscode
+                            </h4>
+                            <button @click="addDresscodeColor()" class="bg-black text-white font-mono text-[10px] px-2 py-1 uppercase">
+                                + Thêm Màu
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <template x-for="(col, idx) in cardData.dresscodeColors" :key="idx">
+                                <div class="flex items-center gap-2 border border-black/10 p-2 bg-beige/20">
+                                    <input type="color" x-model="col.hex" class="w-8 h-8 cursor-pointer border border-black">
+                                    <input type="text" x-model="col.label" placeholder="Tên ngắn" class="w-1/4 border border-black p-1.5 font-mono">
+                                    <input type="text" x-model="col.name" placeholder="Tên hiển thị đầy đủ" class="flex-1 border border-black p-1.5 font-mono">
+                                    <label class="flex items-center gap-1 font-mono text-[10px]">
+                                        <input type="checkbox" x-model="col.textDark"> Chữ đen
+                                    </label>
+                                    <button @click="removeDresscodeColor(idx)" class="text-red-600 font-bold px-2">✕</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- MỤC 4: CẤU HÌNH THÔNG TIN CHUNG -->
+                    <div class="border-b border-black/20 pb-4">
+                        <h4 class="font-mono font-bold text-burgundy uppercase mb-3 text-sm flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> 4. Thông tin Lễ Cưới
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-mono block mb-1">Tên Chú Rể:</label>
+                                <input type="text" x-model="cardData.groom" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Tên Cô Dâu:</label>
+                                <input type="text" x-model="cardData.bride" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Chữ viết tắt (Initials):</label>
+                                <input type="text" x-model="cardData.initials" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Thời gian đếm ngược (ISO):</label>
+                                <input type="datetime-local" x-model="cardData.targetDate" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Hiển thị Ngày (VD: 24.10.2026):</label>
+                                <input type="text" x-model="cardData.dateDisplay" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Hiển thị Giờ (VD: 16:30 PM):</label>
+                                <input type="text" x-model="cardData.timeDisplay" class="w-full border border-black p-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MỤC 5: ĐỊA ĐIỂM, NHẠC NỀN & NGÂN HÀNG -->
+                    <div class="border-b border-black/20 pb-4">
+                        <h4 class="font-mono font-bold text-burgundy uppercase mb-3 text-sm flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i> 5. Địa Điểm, Nhạc Nền & Ngân Hàng
+                        </h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="font-mono block mb-1">Tên Địa Điểm:</label>
+                                <input type="text" x-model="cardData.venueName" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Địa chỉ chi tiết:</label>
+                                <input type="text" x-model="cardData.venueAddress" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Link Google Maps:</label>
+                                <input type="text" x-model="cardData.mapUrl" class="w-full border border-black p-2">
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Link MP3 Nhạc nền:</label>
+                                <input type="text" x-model="cardData.musicUrl" class="w-full border border-black p-2">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="font-mono block mb-1">Tên Ngân hàng / Chủ TK:</label>
+                                    <input type="text" x-model="cardData.bankInfo" class="w-full border border-black p-2">
+                                </div>
+                                <div>
+                                    <label class="font-mono block mb-1">Số Tài Khoản:</label>
+                                    <input type="text" x-model="cardData.bankNum" class="w-full border border-black p-2">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="font-mono block mb-1">Email quản trị (phân cách bằng dấu phẩy):</label>
+                                <input type="text" x-model="cardData.allowedEmails" class="w-full border border-black p-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button @click="saveCardData()" class="w-full bg-burgundy text-white font-mono uppercase py-3 hover:bg-black tracking-widest text-xs">
+                        LƯU CẤU HÌNH TRÊN TRÌNH DUYỆT HIỆN TẠI
+                    </button>
+
+                    <!-- DANH SÁCH KHÁCH RSVP -->
+                    <div class="mt-8 border-t-2 border-black pt-6">
+                        <h4 class="font-mono font-bold uppercase mb-4 text-sm text-burgundy">// Danh sách Khách Phản hồi RSVP (<span x-text="rsvpList.length"></span>)</h4>
+                        
+                        <template x-if="rsvpList.length === 0">
+                            <p class="font-mono text-charcoal/50 italic">Chưa có phản hồi nào.</p>
+                        </template>
+
+                        <div class="space-y-3 max-h-60 overflow-y-auto">
+                            <template x-for="(item, index) in rsvpList" :key="index">
+                                <div class="border border-black/20 p-3 bg-beige/40 font-mono text-xs">
+                                    <div class="flex justify-between font-bold text-black mb-1">
+                                        <span x-text="`${item.name} (${item.phone || 'N/A'})`"></span>
+                                        <span class="text-burgundy" x-text="item.status"></span>
+                                    </div>
+                                    <div class="text-charcoal/70">Số người đi cùng: <b x-text="item.count"></b></div>
+                                    <div class="italic text-charcoal/80 mt-1" x-text="`&ldquo;${item.message || 'Không có lời chúc'}&rdquo;`"></div>
+                                    <div class="text-[9px] text-charcoal/40 mt-1" x-text="item.date"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- NÚT MỞ ADMIN NỔI Ở GÓC DƯỚI (TỰ ĐỘNG ẨN KHI GỬI LINK KHÁCH MỜI) -->
+    <button x-show="showAdminBtn" @click="adminOpen = true" class="fixed bottom-6 left-6 z-30 bg-charcoal text-white hover:bg-burgundy p-3 rounded-full border border-white/20 shadow-lg transition-all" title="Cấu hình Thiệp">
+        <i data-lucide="settings" class="w-5 h-5"></i>
+    </button>
+
+    <!-- 11. FOOTER -->
+    <footer class="border-t border-black/20 py-12 px-6 text-center bg-beige/40 relative">
+        <p class="font-serif text-2xl italic mb-2 text-charcoal">Thank you for being part of our story.</p>
+        <p class="font-mono text-xs text-charcoal/50 uppercase tracking-widest">
+            BLAHAUS EDITORIAL WEDDING • 2026
+            <span @click="showAdminBtn = true; adminOpen = true" class="cursor-pointer hover:text-burgundy">.</span>
+        </p>
+    </footer>
+
+</body>
+</html>
